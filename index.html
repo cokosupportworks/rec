@@ -8,25 +8,49 @@
 <style>
 :root{color-scheme:dark;--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#f0f3f6;--muted:#8b949e;--accent:#58a6ff;--red:#ff7b72;--green:#3fb950}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif}
-main{max-width:1100px;margin:auto;padding:16px;padding-bottom:40px}
-h1{font-size:22px;margin:0 0 14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
-label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
-select,button,input[type=range]{width:100%;min-height:46px;border-radius:10px;border:1px solid var(--line);background:#21262d;color:var(--text);font-size:16px}
-select{padding:0 10px}button{padding:10px 14px;font-weight:650;cursor:pointer}
-button.primary{background:var(--accent);color:#08111c;border-color:var(--accent)}button.danger{background:#3d1618;border-color:#7d2527;color:#ffb4ad}
-button:disabled{opacity:.45;cursor:not-allowed}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.meter{height:30px;background:#0b0e12;border:1px solid var(--line);border-radius:8px;overflow:hidden}.meter canvas{width:100%;height:100%;display:block}
-.status{color:var(--muted);font-size:13px;min-height:20px;margin-top:8px}
-#wave{width:100%;height:220px;background:#0b0e12;border-radius:10px;display:block;touch-action:none}
-.playbackInfo{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums}
-.trimrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}.value{text-align:right;color:var(--accent);font-variant-numeric:tabular-nums}
-input[type=range]{height:42px;padding:0 8px;accent-color:var(--accent)}
-.info{font-size:12px;color:var(--muted);line-height:1.5}
-@media(max-width:700px){.grid{grid-template-columns:1fr}.buttons{grid-template-columns:1fr 1fr}main{padding:10px}.card{padding:12px}}
-@media(orientation:landscape) and (min-width:700px){.grid{grid-template-columns:1fr 1fr}.editor{grid-column:1/-1}}
-</style>
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif}
+body{overflow:hidden}
+main{height:100dvh;max-width:1400px;margin:auto;padding:8px 12px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:8px}
+h1{font-size:19px;margin:0;line-height:28px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 11px;margin:0;min-width:0}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+select,button,input[type=range]{border-radius:8px;border:1px solid var(--line);background:#21262d;color:var(--text);font-size:14px}
+select{height:36px;padding:0 8px;width:100%}
+button{min-height:36px;padding:7px 12px;font-weight:650;cursor:pointer}
+button.primary{background:var(--accent);color:#08111c;border-color:var(--accent)}
+button.danger{background:#3d1618;border-color:#7d2527;color:#ffb4ad}
+button:disabled{opacity:.45;cursor:not-allowed}
+.buttons{display:flex;gap:7px;flex-wrap:wrap}
+.buttons button{flex:0 1 auto;min-width:110px}
+.status{color:var(--muted);font-size:11px;min-height:15px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meter{height:22px;background:#0b0e12;border:1px solid var(--line);border-radius:6px;overflow:hidden}.meter canvas{width:100%;height:100%;display:block}
+.editor{display:flex;flex-direction:column;min-height:0}
+.editor>label{flex:0 0 auto}
+#wave{width:100%;height:min(34vh,190px);min-height:100px;background:#0b0e12;border-radius:8px;display:block;touch-action:none;flex:0 0 auto}
+.trimrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:5px}
+.trimrow>div>div{font-size:12px}
+.value{text-align:right;color:var(--accent);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;height:32px;padding:0 6px;accent-color:var(--accent)}
+.playbackInfo{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:1px;font-variant-numeric:tabular-nums}
+.gainbox{margin-top:5px}
+.gainbox .info{margin-top:2px}
+.info{font-size:10px;color:var(--muted);line-height:1.35}
+.editor .buttons{margin-top:6px!important}
+.export{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.export .info{flex:1}
+@media(max-width:700px) and (orientation:portrait){
+  body{overflow:auto}
+  main{height:auto;min-height:100dvh;grid-template-rows:auto auto auto auto;padding:10px}
+  .grid{grid-template-columns:1fr}
+  #wave{height:180px}
+  .buttons button{flex:1}
+}
+@media(orientation:landscape) and (min-width:700px) and (max-height:900px){
+  main{grid-template-rows:auto auto minmax(0,1fr) auto}
+  #wave{height:min(30vh,175px)}
+}
+</style></style>
 </head>
 <body>
 <main>
@@ -62,7 +86,7 @@ input[type=range]{height:42px;padding:0 8px;accent-color:var(--accent)}
   <div>ゲイン（波形に適用） <span class="value" id="gainVal">0.0 dB</span></div>
   <input id="gainRange" type="range" min="-24" max="12" step="0.1" value="0" disabled>
   <div class="playbackInfo"><span>-24 dB</span><span>0 dB</span><span>+12 dB</span></div>
-  <div class="info" id="gainPreviewInfo" style="margin-top:6px">スライダーを動かすと、適用後の予想波形を黄色で重ねて表示します。</div>
+  <div class="info" id="gainPreviewInfo">黄色＝ゲイン適用後の予想波形。ピークも表示します。</div>
 </div>
 <div class="buttons" style="margin-top:12px">
   <button id="applyGain" class="primary" disabled>✓ ゲインを適用</button>
@@ -82,7 +106,7 @@ input[type=range]{height:42px;padding:0 8px;accent-color:var(--accent)}
 </div>
 </section>
 
-<section class="card">
+<section class="card export">
 <label>エクスポート</label>
 <div class="buttons">
 <button id="wav" disabled>WAVで保存</button>
@@ -178,10 +202,11 @@ function stopPlayback(){
   $("pause").disabled=true;
   drawWave();
 }
-function startPlayback(){
+async function startPlayback(){
   if(!buffer)return;
   stopPlayback();
   playbackCtx=playbackCtx || new (window.AudioContext||window.webkitAudioContext)();
+  try{await playbackCtx.resume();}catch(e){$("status").textContent="再生用オーディオを開始できません: "+e.message;return;}
   playbackGain=playbackGain || playbackCtx.createGain();
   playbackGain.gain.value=Number($("gainRange").value)/100;
   playbackGain.connect(playbackCtx.destination);
@@ -198,7 +223,9 @@ function startPlayback(){
   $("play").textContent="▶ 再生中";
   $("pause").disabled=false;
   src.onended=()=>{ if(playbackSource===src){isPlaying=false;playbackSource=null;cancelAnimationFrame(playbackRAF);currentPlayhead=trimEnd;$("play").textContent="▶ 再生";$("pause").disabled=true;drawWave();} };
+  src.onstart=null;
   src.start(0,offset,duration);
+  $("status").textContent=`再生中　${offset.toFixed(3)}–${trimEnd.toFixed(3)} 秒　ゲイン ${((Number($("gainRange").value)||0)).toFixed(1)} dB`;
   animatePlayhead();
 }
 function animatePlayhead(){
@@ -223,10 +250,9 @@ function cloneAudioBuffer(src){
   for(let c=0;c<src.numberOfChannels;c++) b.getChannelData(c).set(src.getChannelData(c));
   return b;
 }
-function pushHistory(){
-  if(!buffer)return;
+function pushHistorySnapshot(snapshot){
   editHistory=editHistory.slice(0,historyIndex+1);
-  editHistory.push(cloneAudioBuffer(buffer));
+  editHistory.push(cloneAudioBuffer(snapshot));
   if(editHistory.length>30)editHistory.shift();
   historyIndex=editHistory.length-1;
   updateHistoryButtons();
@@ -276,12 +302,16 @@ $("resetGain").onclick=()=>{
 $("applyGain").onclick=()=>{
   if(!buffer||Math.abs(pendingGainDb)<0.0001)return;
   stopPlayback();
-  pushHistory();
+  const before=cloneAudioBuffer(buffer);
   const g=dbToGain(pendingGainDb);
   for(let c=0;c<buffer.numberOfChannels;c++){
     const d=buffer.getChannelData(c);
     for(let i=0;i<d.length;i++) d[i]*=g;
   }
+  pushHistorySnapshot(before);
+  editHistory.push(cloneAudioBuffer(buffer));
+  historyIndex=editHistory.length-1;
+  updateHistoryButtons();
   $("status").textContent=`ゲイン ${pendingGainDb>=0?"+":""}${pendingGainDb.toFixed(1)} dB を波形に適用しました。`;
   pendingGainDb=0;$("gainRange").value=0;$("gainVal").textContent="0.0 dB";
   $("gainPreviewInfo").textContent="適用完了。";
@@ -367,24 +397,30 @@ $("startRange").oninput=e=>setTrim("start",e.target.value);
 $("endRange").oninput=e=>setTrim("end",e.target.value);
 $("resetTrim").onclick=()=>{stopPlayback();trimStart=0;trimEnd=buffer.duration;currentPlayhead=0;updateEditor()};
 
+let dragHandle=null;
 wave.addEventListener("pointerdown",e=>{
   if(!buffer)return;wave.setPointerCapture(e.pointerId);
   const r=wave.getBoundingClientRect(),t=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*buffer.duration;
-  const ds=Math.abs(t-trimStart),de=Math.abs(t-trimEnd); setTrim(ds<de?"start":"end",t);
+  const ds=Math.abs(t-trimStart),de=Math.abs(t-trimEnd);
+  dragHandle=ds<de?"start":"end"; setTrim(dragHandle,t);
 });
 wave.addEventListener("pointermove",e=>{
   if(!buffer||!wave.hasPointerCapture(e.pointerId))return;
   const r=wave.getBoundingClientRect(),t=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*buffer.duration;
-  const ds=Math.abs(t-trimStart),de=Math.abs(t-trimEnd);setTrim(ds<de?"start":"end",t);
+  setTrim(dragHandle,t);
 });
+wave.addEventListener("pointerup",e=>{dragHandle=null;});
 
 $("normalize").onclick=()=>{
   if(!buffer)return;
-  stopPlayback();pushHistory();let peak=0;
+  stopPlayback();const before=cloneAudioBuffer(buffer);let peak=0;
   for(let c=0;c<buffer.numberOfChannels;c++){const d=buffer.getChannelData(c);for(let i=0;i<d.length;i++)peak=Math.max(peak,Math.abs(d[i]))}
   if(!peak)return;const gain=Math.pow(10,-.3/20)/peak;
   for(let c=0;c<buffer.numberOfChannels;c++){const d=buffer.getChannelData(c);for(let i=0;i<d.length;i++)d[i]*=gain}
-  normalized=true;drawWave();$("status").textContent="ノーマライズ完了（ピーク -0.3 dBFS）";
+  normalized=true;
+  pushHistorySnapshot(before);
+  editHistory.push(cloneAudioBuffer(buffer));historyIndex=editHistory.length-1;updateHistoryButtons();
+  drawWave();$("status").textContent="ノーマライズ完了（ピーク -0.3 dBFS）";
 };
 
 function trimmed(){
