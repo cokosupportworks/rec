@@ -157,14 +157,11 @@
                 <button id="record-btn" disabled class="w-16 h-16 rounded-full bg-gray-700 hover:bg-gray-600 border-2 border-red-500 flex items-center justify-center transition-all focus:outline-none focus:ring-4 focus:ring-red-900 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
                     <div id="record-icon" class="w-6 h-6 rounded-full bg-red-500 transition-all"></div>
                 </button>
-                <button id="stop-btn" disabled class="w-16 h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all focus:outline-none">
-                    <div class="w-6 h-6 bg-gray-300 rounded-sm"></div>
-                </button>
                 <button id="play-btn" disabled class="w-16 h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all focus:outline-none hidden">
-                     <svg class="w-8 h-8 text-green-400 ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
-                </button>
-                 <button id="stop-play-btn" disabled class="w-16 h-16 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all focus:outline-none hidden">
-                    <div class="w-6 h-6 bg-gray-300 rounded-sm"></div>
+                     <div id="play-icon">
+                         <svg class="w-8 h-8 text-green-400 ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                     </div>
+                     <div id="stop-play-icon" class="hidden w-6 h-6 bg-gray-300 rounded-sm"></div>
                 </button>
             </div>
             <p id="rec-info" class="text-sm text-gray-400 mt-4 h-5"></p>
@@ -281,9 +278,9 @@
         
         const recordBtn = document.getElementById('record-btn');
         const recordIcon = document.getElementById('record-icon');
-        const stopBtn = document.getElementById('stop-btn');
         const playBtn = document.getElementById('play-btn');
-        const stopPlayBtn = document.getElementById('stop-play-btn');
+        const playIcon = document.getElementById('play-icon');
+        const stopPlayIcon = document.getElementById('stop-play-icon');
         const timeDisplay = document.getElementById('time-display');
         const recInfo = document.getElementById('rec-info');
         const statusBadge = document.getElementById('status-badge');
@@ -525,51 +522,50 @@
 
         // --- Recording Controls ---
         recordBtn.addEventListener('click', () => {
-            // Reset state
-            recordedBuffersL = [];
-            recordedBuffersR = [];
-            recordingLength = 0;
-            isRecording = true;
-            startTime = audioContext.currentTime;
-            
-            // UI Updates
-            recordBtn.disabled = true;
-            stopBtn.disabled = false;
-            playBtn.classList.add('hidden');
-            stopPlayBtn.classList.add('hidden');
-            editorSection.classList.add('opacity-50', 'pointer-events-none');
-            
-            recordIcon.classList.remove('rounded-full');
-            recordIcon.classList.add('rounded-sm');
-            statusBadge.textContent = "Recording...";
-            statusBadge.classList.replace('bg-green-800', 'bg-red-800');
-            statusBadge.classList.replace('text-green-100', 'text-red-100');
-            
-            // Timer
-            timerInterval = setInterval(() => {
-                const elapsed = audioContext.currentTime - startTime;
-                timeDisplay.textContent = formatTime(elapsed);
-            }, 50); // Fast update for ms
-        });
-
-        stopBtn.addEventListener('click', () => {
-            if (!isRecording) return;
-            isRecording = false;
-            clearInterval(timerInterval);
-            
-            // UI Updates
-            recordBtn.disabled = false;
-            stopBtn.disabled = true;
-            playBtn.classList.remove('hidden');
-            playBtn.disabled = false;
-            
-            recordIcon.classList.add('rounded-full');
-            recordIcon.classList.remove('rounded-sm');
-            statusBadge.textContent = "Editing";
-            statusBadge.classList.replace('bg-red-800', 'bg-indigo-800');
-            statusBadge.classList.replace('text-red-100', 'text-indigo-100');
-            
-            processRecording();
+            if (!isRecording) {
+                // Reset state & Start Recording
+                recordedBuffersL = [];
+                recordedBuffersR = [];
+                recordingLength = 0;
+                isRecording = true;
+                startTime = audioContext.currentTime;
+                
+                // UI Updates
+                playBtn.classList.add('hidden');
+                editorSection.classList.add('opacity-50', 'pointer-events-none');
+                
+                recordIcon.classList.remove('rounded-full');
+                recordIcon.classList.add('rounded-sm');
+                recordBtn.classList.add('animate-pulse');
+                
+                statusBadge.textContent = "Recording...";
+                statusBadge.classList.replace('bg-green-800', 'bg-red-800');
+                statusBadge.classList.replace('text-green-100', 'text-red-100');
+                
+                // Timer
+                timerInterval = setInterval(() => {
+                    const elapsed = audioContext.currentTime - startTime;
+                    timeDisplay.textContent = formatTime(elapsed);
+                }, 50); // Fast update for ms
+            } else {
+                // Stop Recording
+                isRecording = false;
+                clearInterval(timerInterval);
+                
+                // UI Updates
+                playBtn.classList.remove('hidden');
+                playBtn.disabled = false;
+                
+                recordIcon.classList.add('rounded-full');
+                recordIcon.classList.remove('rounded-sm');
+                recordBtn.classList.remove('animate-pulse');
+                
+                statusBadge.textContent = "Editing";
+                statusBadge.classList.replace('bg-red-800', 'bg-indigo-800');
+                statusBadge.classList.replace('text-red-100', 'text-indigo-100');
+                
+                processRecording();
+            }
         });
 
         // --- Process and Build AudioBuffer ---
@@ -757,6 +753,11 @@
 
         // --- Playback ---
         playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                stopPlayback();
+                return;
+            }
+
             if (!currentAudioBuffer) return;
             
             const dur = currentAudioBuffer.duration;
@@ -771,8 +772,8 @@
             playbackSourceNode.start(0, tStart, playDur);
             isPlaying = true;
             
-            playBtn.classList.add('hidden');
-            stopPlayBtn.classList.remove('hidden');
+            playIcon.classList.add('hidden');
+            stopPlayIcon.classList.remove('hidden');
             
             // Visual playback timer
             let playStartTime = audioContext.currentTime;
@@ -794,8 +795,6 @@
             };
         });
 
-        stopPlayBtn.addEventListener('click', stopPlayback);
-
         function stopPlayback() {
             if (playbackSourceNode) {
                 try { playbackSourceNode.stop(); } catch(e){}
@@ -803,8 +802,8 @@
                 playbackSourceNode = null;
             }
             isPlaying = false;
-            playBtn.classList.remove('hidden');
-            stopPlayBtn.classList.add('hidden');
+            playIcon.classList.remove('hidden');
+            stopPlayIcon.classList.add('hidden');
             updateTrimUI(); // Reset time display to duration
         }
 
