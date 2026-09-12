@@ -344,31 +344,52 @@
         });
 
         // --- Setup Audio Devices ---
-        async function getDevices() {
+        async function updateDeviceList() {
             try {
-                // Request permission first (required in Safari to see device labels)
-                const tempStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                tempStream.getTracks().forEach(t => t.stop());
-
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const audioInputs = devices.filter(device => device.kind === 'audioinput');
                 
+                const currentVal = deviceSelect.value;
                 deviceSelect.innerHTML = '';
-                audioInputs.forEach(device => {
+                
+                if (audioInputs.length === 0) {
                     const option = document.createElement('option');
-                    option.value = device.deviceId;
-                    option.text = device.label || `Microphone ${deviceSelect.length + 1}`;
+                    option.value = 'default';
+                    option.text = 'Default Device';
                     deviceSelect.appendChild(option);
-                });
+                } else {
+                    audioInputs.forEach((device, index) => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId || 'default';
+                        option.text = device.label || `Microphone ${index + 1}`;
+                        deviceSelect.appendChild(option);
+                    });
+                }
+
+                // Restore selection if it exists in the new list
+                if (currentVal && Array.from(deviceSelect.options).some(opt => opt.value === currentVal)) {
+                    deviceSelect.value = currentVal;
+                }
             } catch (err) {
                 console.error("Error enumerating devices:", err);
-                showModal("Device Error", "Could not enumerate audio devices. Please ensure permissions are granted.");
             }
+        }
+
+        // Handle device change automatically if already connected
+        deviceSelect.addEventListener('change', () => {
+            if (mediaStream) {
+                initAudioBtn.click(); // Reconnect with new device
+            }
+        });
+
+        // Update list if devices are plugged/unplugged
+        if (navigator.mediaDevices.ondevicechange !== undefined) {
+            navigator.mediaDevices.ondevicechange = updateDeviceList;
         }
 
         // Run once on load to populate if permissions are already granted
         navigator.mediaDevices.enumerateDevices().then(devices => {
-            if (devices.some(d => d.label !== "")) getDevices();
+            if (devices.some(d => d.label !== "")) updateDeviceList();
         });
 
         // --- Initialize Audio System ---
@@ -382,15 +403,19 @@
 
             try {
                 // High-quality constraints: disable all processing
-                const constraints = {
-                    audio: {
-                        deviceId: deviceSelect.value ? { exact: deviceSelect.value } : undefined,
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false,
-                        channelCount: 2 // Try to request stereo
-                    }
+                const audioConstraints = {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false,
+                    channelCount: 2 // Try to request stereo
                 };
+                
+                // Safely apply deviceId only if it's not the 'default' placeholder
+                if (deviceSelect.value && deviceSelect.value !== 'default') {
+                    audioConstraints.deviceId = { exact: deviceSelect.value };
+                }
+
+                const constraints = { audio: audioConstraints };
 
                 mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 
@@ -431,10 +456,8 @@
                 // Start UI loops
                 requestAnimationFrame(drawMeter);
                 
-                // If devices weren't labeled before, fetch them now that we have permission
-                if (deviceSelect.options.length <= 1) {
-                    getDevices();
-                }
+                // Fetch devices now that we have active permission
+                await updateDeviceList();
 
             } catch (err) {
                 console.error("Initialization error:", err);
