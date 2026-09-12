@@ -58,6 +58,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            transform: translateX(-50%); /* ハンドルの中心を指定位置に合わせる */
         }
         
         .trim-handle::after {
@@ -69,7 +70,7 @@
         }
 
         #trim-start { left: 0; }
-        #trim-end { right: 0; }
+        #trim-end { left: 100%; right: auto; }
         
         .trim-overlay {
             position: absolute;
@@ -81,7 +82,7 @@
         }
 
         #overlay-left { left: 0; width: 0; }
-        #overlay-right { right: 0; width: 0; }
+        #overlay-right { right: auto; left: 100%; width: 0; }
 
         /* Custom Scrollbar for better look */
         ::-webkit-scrollbar {
@@ -171,24 +172,48 @@
 
         <!-- Editor & Export Section -->
         <section id="editor-section" class="bg-gray-800 p-5 rounded-xl shadow-lg border border-gray-700 opacity-50 pointer-events-none transition-opacity">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-gray-100 flex items-center gap-2">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-4">
+                <h2 class="text-lg font-semibold text-gray-100 flex items-center gap-2 whitespace-nowrap">
                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"></path></svg>
                     Edit & Export
                 </h2>
-                <button id="normalize-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded-md transition-colors text-sm flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-8m-4 8l-4-8"></path></svg>
-                    Normalize (0dB)
-                </button>
+                
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Zoom Controls -->
+                    <div class="flex items-center bg-gray-700 rounded-md p-1 border border-gray-600">
+                        <button id="zoom-out-btn" class="p-1 hover:bg-gray-500 rounded text-gray-300 focus:outline-none transition-colors" title="Zoom Out">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                        </button>
+                        <span id="zoom-level-display" class="text-xs font-mono px-2 text-gray-300 w-12 text-center">1.0x</span>
+                        <button id="zoom-in-btn" class="p-1 hover:bg-gray-500 rounded text-gray-300 focus:outline-none transition-colors" title="Zoom In">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Gain Controls -->
+                    <div class="flex items-center gap-2 bg-gray-700 rounded-md p-1 px-2 border border-gray-600">
+                        <span class="text-xs text-gray-400">Gain:</span>
+                        <input type="range" id="gain-slider" min="-20" max="20" step="1" value="0" class="w-20 h-1.5 bg-gray-500 rounded-lg appearance-none cursor-pointer">
+                        <span id="gain-val-display" class="text-xs font-mono w-12 text-right text-gray-300">0dB</span>
+                        <button id="apply-gain-btn" class="bg-blue-600 hover:bg-blue-700 text-white text-xs py-1 px-2 ml-1 rounded transition-colors focus:outline-none">Apply</button>
+                    </div>
+
+                    <button id="normalize-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded-md transition-colors text-sm flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-8m-4 8l-4-8"></path></svg>
+                        Normalize
+                    </button>
+                </div>
             </div>
 
             <!-- Waveform Editor -->
-            <div class="waveform-container mb-2" id="waveform-container">
-                <canvas id="waveform-canvas"></canvas>
-                <div id="overlay-left" class="trim-overlay"></div>
-                <div id="overlay-right" class="trim-overlay"></div>
-                <div id="trim-start" class="trim-handle" data-type="start"></div>
-                <div id="trim-end" class="trim-handle" data-type="end"></div>
+            <div class="waveform-container mb-2 overflow-x-auto" id="waveform-container">
+                <div id="waveform-scroll-area" class="h-full relative min-w-full">
+                    <canvas id="waveform-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+                    <div id="overlay-left" class="trim-overlay absolute top-0 bottom-0 left-0"></div>
+                    <div id="overlay-right" class="trim-overlay absolute top-0 bottom-0"></div>
+                    <div id="trim-start" class="trim-handle absolute" data-type="start"></div>
+                    <div id="trim-end" class="trim-handle absolute" data-type="end"></div>
+                </div>
             </div>
             
             <div class="flex justify-between text-xs text-gray-400 font-mono mb-6">
@@ -247,6 +272,7 @@
         let trimStartRatio = 0; // 0.0 to 1.0
         let trimEndRatio = 1.0; // 0.0 to 1.0
         let playbackSourceNode = null;
+        let zoomLevel = 1.0; // 追加: ズームレベル
 
         // UI Elements
         const initAudioBtn = document.getElementById('init-audio-btn');
@@ -273,7 +299,16 @@
         const waveCanvas = document.getElementById('waveform-canvas');
         const waveCtx = waveCanvas.getContext('2d');
         const waveContainer = document.getElementById('waveform-container');
+        const waveScrollArea = document.getElementById('waveform-scroll-area');
         
+        // Editor Controls (Zoom & Gain)
+        const zoomInBtn = document.getElementById('zoom-in-btn');
+        const zoomOutBtn = document.getElementById('zoom-out-btn');
+        const zoomLevelDisplay = document.getElementById('zoom-level-display');
+        const gainSlider = document.getElementById('gain-slider');
+        const gainValDisplay = document.getElementById('gain-val-display');
+        const applyGainBtn = document.getElementById('apply-gain-btn');
+
         // Trim UI
         const trimStartHandle = document.getElementById('trim-start');
         const trimEndHandle = document.getElementById('trim-end');
@@ -581,8 +616,14 @@
 
         // --- Waveform Rendering ---
         function drawWaveform(buffer) {
-            const width = waveContainer.clientWidth;
+            if (!buffer) return;
+            const containerWidth = waveContainer.clientWidth;
+            // ズームレベルに応じて論理的な幅を計算
+            const width = Math.max(containerWidth, containerWidth * zoomLevel);
             const height = waveContainer.clientHeight;
+            
+            // スクロールエリアの幅を広げる
+            waveScrollArea.style.width = width + 'px';
             
             waveCanvas.width = width * window.devicePixelRatio;
             waveCanvas.height = height * window.devicePixelRatio;
@@ -632,15 +673,16 @@
         function updateTrimUI() {
             if (!currentAudioBuffer) return;
             
-            const w = waveContainer.clientWidth;
+            const w = waveScrollArea.clientWidth; // ズーム後の幅を基準にする
             const startPx = trimStartRatio * w;
             const endPx = trimEndRatio * w;
 
             trimStartHandle.style.left = startPx + 'px';
-            trimEndHandle.style.left = (w - endPx) + 'px'; // right offset
+            trimEndHandle.style.left = endPx + 'px'; // 修正: 右からのオフセットではなく左からの座標を指定
 
             overlayLeft.style.width = startPx + 'px';
-            overlayRight.style.width = (w - endPx) + 'px';
+            overlayRight.style.left = endPx + 'px';
+            overlayRight.style.width = Math.max(0, w - endPx) + 'px';
 
             const dur = currentAudioBuffer.duration;
             const tStart = trimStartRatio * dur;
@@ -676,8 +718,8 @@
         function handlePointerMove(e) {
             if (!isDragging || !activeHandle) return;
             
-            const rect = waveContainer.getBoundingClientRect();
-            // Get X coordinate (mouse or touch)
+            const rect = waveScrollArea.getBoundingClientRect();
+            // スクロールエリアを基準にしたX座標を取得
             const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
             let x = clientX - rect.left;
             
@@ -688,11 +730,11 @@
 
             if (activeHandle === 'start') {
                 // Ensure start doesn't pass end
-                if (ratio >= trimEndRatio - 0.01) ratio = trimEndRatio - 0.01;
+                if (ratio >= trimEndRatio - 0.005) ratio = trimEndRatio - 0.005;
                 trimStartRatio = ratio;
             } else if (activeHandle === 'end') {
                 // Ensure end doesn't pass start
-                if (ratio <= trimStartRatio + 0.01) ratio = trimStartRatio + 0.01;
+                if (ratio <= trimStartRatio + 0.005) ratio = trimStartRatio + 0.005;
                 trimEndRatio = ratio;
             }
 
@@ -798,6 +840,79 @@
                 } else {
                      showModal("Info", "Audio is already at 0dBFS or silent.");
                 }
+                recInfo.textContent = `Recorded ${formatTime(currentAudioBuffer.duration)}`;
+            }, 50);
+        });
+
+        // --- Zoom Controls ---
+        function updateZoom() {
+            zoomLevelDisplay.textContent = zoomLevel.toFixed(1) + 'x';
+            if (currentAudioBuffer) {
+                drawWaveform(currentAudioBuffer);
+                updateTrimUI();
+            }
+        }
+
+        zoomInBtn.addEventListener('click', () => {
+            if (zoomLevel < 10.0) {
+                zoomLevel += 0.5;
+                updateZoom();
+            }
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            if (zoomLevel > 1.0) {
+                zoomLevel -= 0.5;
+                if (zoomLevel < 1.0) zoomLevel = 1.0;
+                updateZoom();
+            }
+        });
+
+        // --- Gain Controls ---
+        gainSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            gainValDisplay.textContent = (val > 0 ? '+' : '') + val + 'dB';
+        });
+
+        applyGainBtn.addEventListener('click', () => {
+            if (!currentAudioBuffer) return;
+            const db = parseFloat(gainSlider.value);
+            if (db === 0) {
+                showModal("Info", "Gain is set to 0dB. No changes applied.");
+                return;
+            }
+
+            recInfo.textContent = "Applying Gain...";
+            
+            setTimeout(() => {
+                const multiplier = Math.pow(10, db / 20);
+                const len = currentAudioBuffer.length;
+                const chL = currentAudioBuffer.getChannelData(0);
+                const chR = currentAudioBuffer.getChannelData(1);
+                
+                let clipped = false;
+
+                for (let i = 0; i < len; i++) {
+                    let nL = chL[i] * multiplier;
+                    let nR = chR[i] * multiplier;
+                    
+                    if (Math.abs(nL) > 1.0 || Math.abs(nR) > 1.0) clipped = true;
+                    
+                    // Hard clip (防止歪み)
+                    chL[i] = Math.max(-1.0, Math.min(1.0, nL));
+                    chR[i] = Math.max(-1.0, Math.min(1.0, nR));
+                }
+
+                drawWaveform(currentAudioBuffer);
+                
+                const msg = clipped 
+                    ? `Gain applied (${db > 0 ? '+' : ''}${db}dB). Note: Some audio exceeded 0dB and was clipped.` 
+                    : `Gain applied (${db > 0 ? '+' : ''}${db}dB).`;
+                showModal("Gain Applied", msg);
+                
+                // Reset slider
+                gainSlider.value = 0;
+                gainValDisplay.textContent = "0dB";
                 recInfo.textContent = `Recorded ${formatTime(currentAudioBuffer.duration)}`;
             }, 50);
         });
