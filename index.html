@@ -180,11 +180,9 @@
 
     <header class="w-full max-w-5xl mb-2 flex justify-between items-center border-b border-[#00b4d8]/30 pb-2 relative z-10 shrink-0">
         <div class="flex items-center gap-2">
-            <!-- 貝殻や波を思わせるアイコン -->
-            <svg class="w-6 h-6 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 17.58A5 5 0 0018 8h-1.26A8 8 0 104 16.25M20 17.58V22l-4-4"></path>
-            </svg>
-            <h1 class="text-2xl font-bold font-hime text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-[#0077b6] tracking-wider drop-shadow-sm">音ノ姫</h1>
+            <!-- アイコンをhime02.pngに置き換え -->
+            <img src="./hime02.png" alt="姫" class="h-7 w-7 object-contain drop-shadow-sm" onerror="this.src='https://placehold.co/512x512/transparent/0077b6?text=hime02';">
+            <h1 class="text-2xl font-bold font-hime text-[#0077b6] tracking-wider drop-shadow-md">音ノ姫</h1>
         </div>
         <div id="status-badge" class="px-3 py-1 rounded-full text-[10px] font-bold border border-[#00b4d8] bg-white/50 text-[#0077b6] shadow-sm">支度中 (Ready)</div>
     </header>
@@ -257,7 +255,7 @@
             </section>
         </div>
 
-        <section id="editor-section" class="edo-panel p-3 opacity-50 pointer-events-none transition-opacity duration-500 flex flex-col flex-1 min-h-0">
+        <section id="editor-section" class="edo-panel p-3 flex flex-col flex-1 min-h-0">
             <!-- ツールバー -->
             <div class="flex flex-wrap md:flex-nowrap justify-between items-center mb-2 gap-2 shrink-0">
                 <h2 class="font-hime text-[#0077b6] flex items-center gap-1 text-lg font-bold whitespace-nowrap">
@@ -303,18 +301,18 @@
             </div>
 
             <!-- ▼ 波形下のコントロール＆画像エリア ▼ -->
-            <div class="flex flex-row gap-4 flex-1 min-h-0 shrink-0 mb-2">
+            <div class="flex flex-row gap-2 md:gap-4 flex-1 min-h-0 shrink-0 mb-2">
                 
                 <!-- 左側：姫画像エリア (赤線領域) -->
-                <div class="flex-1 relative bg-white/20 rounded-xl border border-white/40 shadow-inner flex items-center justify-center p-2 overflow-hidden">
+                <div class="w-1/2 relative bg-white/20 rounded-xl border border-white/40 shadow-inner flex items-center justify-center p-2 overflow-hidden shrink-0">
                     <img src="./hime01.PNG" alt="音ノ姫" class="w-full h-full object-contain drop-shadow-md" onerror="this.src='https://placehold.co/1437x1095/transparent/0077b6?text=hime01.PNG';">
                 </div>
 
                 <!-- 右側：編集・書き出しコントロール (緑線領域) -->
-                <div class="w-[280px] md:w-[320px] shrink-0 bg-white/40 p-4 rounded-xl border border-white/60 shadow-sm flex flex-col justify-between gap-3 overflow-y-auto">
+                <div class="w-1/2 shrink-0 bg-white/40 p-2 md:p-4 rounded-xl border border-white/60 shadow-sm flex flex-col justify-between gap-2 overflow-y-auto">
                     
                     <!-- ゲイン調整 -->
-                    <div class="flex flex-col gap-2">
+                    <div class="flex flex-col gap-1 md:gap-2">
                         <div class="flex justify-between items-end">
                             <span class="text-sm font-bold text-[#00b4d8]">Gain:</span>
                             <span id="gain-val-display" class="text-sm font-mono font-bold text-[#0077b6]">0dB</span>
@@ -649,7 +647,8 @@
                 playBtn.classList.add('hidden');
                 if (isPlaying) stopPlayback();
                 
-                editorSection.classList.add('opacity-50', 'pointer-events-none');
+                // 録音中のエディタセクションの無効化（透明度は下げない）
+                editorSection.classList.add('pointer-events-none');
                 
                 recordIcon.classList.remove('rounded-full');
                 recordIcon.classList.add('rounded-sm');
@@ -719,7 +718,7 @@
             updateTrimUI();
             drawWaveform(currentAudioBuffer);
             
-            editorSection.classList.remove('opacity-50', 'pointer-events-none');
+            editorSection.classList.remove('pointer-events-none');
             recInfo.textContent = `記録完了 ${formatTime(currentAudioBuffer.duration)}`;
         }
 
@@ -769,6 +768,34 @@
             waveCtx.strokeStyle = '#00b4d8'; // Clear blue waveform
             waveCtx.lineWidth = 1;
             waveCtx.stroke();
+
+            // ▼▼▼ プレビュー波形の描画（ここから追加） ▼▼▼
+            const previewDb = parseInt(gainSlider.value) || 0;
+            if (previewDb !== 0) {
+                const multiplier = Math.pow(10, previewDb / 20);
+                waveCtx.beginPath();
+                for (let i = 0; i < width; i++) {
+                    let min = 1.0;
+                    let max = -1.0;
+                    for (let j = 0; j < step; j++) {
+                        const datum = data[(i * step) + j] * multiplier;
+                        const clamped = Math.max(-1.0, Math.min(1.0, datum)); // 限界値（クリッピング）を計算
+                        if (clamped < min) min = clamped;
+                        if (clamped > max) max = clamped;
+                    }
+                    waveCtx.moveTo(i, (1 + min) * amp);
+                    waveCtx.lineTo(i, (1 + max) * amp);
+                }
+                waveCtx.strokeStyle = 'rgba(212, 175, 55, 0.8)'; // 江戸の金色でオーバーレイ表示
+                waveCtx.lineWidth = 1.5;
+                waveCtx.stroke();
+                
+                // キャンバス上にプレビュー中であることをテキスト表示
+                waveCtx.fillStyle = '#d4af37';
+                waveCtx.font = "bold 12px 'Noto Sans JP', sans-serif";
+                waveCtx.fillText(`Gain Preview: ${previewDb > 0 ? '+' : ''}${previewDb}dB`, 10, height - 10);
+            }
+            // ▲▲▲ 追加ここまで ▲▲▲
         }
 
         let isDragging = false;
@@ -952,6 +979,10 @@
         gainSlider.addEventListener('input', (e) => {
             const val = parseInt(e.target.value);
             gainValDisplay.textContent = (val > 0 ? '+' : '') + val + 'dB';
+            // スライダー操作時にリアルタイムで波形を再描画（プレビュー反映）
+            if (currentAudioBuffer) {
+                drawWaveform(currentAudioBuffer);
+            }
         });
 
         applyGainBtn.addEventListener('click', () => {
@@ -979,6 +1010,9 @@
                     chR[i] = Math.max(-1.0, Math.min(1.0, nR));
                 }
 
+                // スライダーを0に戻してから波形を描画し直す（プレビューを消すため）
+                gainSlider.value = 0;
+                gainValDisplay.textContent = "0dB";
                 drawWaveform(currentAudioBuffer);
                 
                 const msg = clipped 
@@ -986,8 +1020,6 @@
                     : `音量を変更いたしました (${db > 0 ? '+' : ''}${db}dB)。`;
                 showModal("音量調整 完了", msg);
                 
-                gainSlider.value = 0;
-                gainValDisplay.textContent = "0dB";
                 recInfo.textContent = `記録完了 ${formatTime(currentAudioBuffer.duration)}`;
             }, 50);
         });
@@ -1096,7 +1128,11 @@
                         chL[i] *= multiplier;
                         chR[i] *= multiplier;
                     }
+                    
+                    gainSlider.value = 0; // ノーマライズ時にもスライダーをリセット
+                    gainValDisplay.textContent = "0dB";
                     drawWaveform(currentAudioBuffer);
+                    
                     showModal("最大化 完了", `全体の音量を ${(20 * Math.log10(multiplier)).toFixed(2)} dB 引き上げました。`);
                 } else {
                      showModal("お知らせ", "既に最大音量に達しているか、無音でござりまする。");
