@@ -302,38 +302,51 @@
                 <span id="trim-time-end">00:00.000</span>
             </div>
 
-            <!-- ▼ 波形下の大きなコントロールエリア ▼ -->
-            <div class="flex flex-col gap-2 shrink-0 mb-4 mt-2 flex-1 justify-center">
-                <div class="flex flex-col md:flex-row items-center gap-4 bg-white/40 p-4 rounded-xl border border-white/60 shadow-sm mx-auto w-full max-w-3xl">
-                    <!-- Gain Controls (大きく) -->
-                    <div class="flex-1 flex items-center gap-3 w-full">
-                        <span class="text-base font-bold text-[#00b4d8] whitespace-nowrap">Gain:</span>
-                        <input type="range" id="gain-slider" min="-20" max="20" step="1" value="0" class="flex-1 h-5 bg-white/80 rounded-lg appearance-none cursor-pointer shadow-inner border border-white/50 accent-[#0077b6]">
-                        <span id="gain-val-display" class="text-base font-mono font-bold w-14 text-right text-[#0077b6]">0dB</span>
-                        <button id="apply-gain-btn" class="text-sm py-2 px-4 rounded-lg border border-[#00b4d8] font-bold text-[#00b4d8] bg-white hover:bg-[#00b4d8] hover:text-white transition-colors shadow-sm whitespace-nowrap ml-2">適用</button>
-                    </div>
-                    
-                    <div class="w-[2px] h-10 bg-[#00b4d8]/30 hidden md:block"></div>
-                    <div class="h-[2px] w-full bg-[#00b4d8]/30 md:hidden"></div>
+            <!-- ▼ 波形下のコントロール＆画像エリア ▼ -->
+            <div class="flex flex-row gap-4 flex-1 min-h-0 shrink-0 mb-2">
+                
+                <!-- 左側：姫画像エリア (赤線領域) -->
+                <div class="flex-1 relative bg-white/20 rounded-xl border border-white/40 shadow-inner flex items-center justify-center p-2 overflow-hidden">
+                    <img src="./hime01.PNG" alt="音ノ姫" class="w-full h-full object-contain drop-shadow-md" onerror="this.src='https://placehold.co/1437x1095/transparent/0077b6?text=hime01.PNG';">
+                </div>
 
-                    <!-- Normalize (大きく) -->
-                    <button id="normalize-btn" class="btn-gold py-2.5 px-6 rounded-lg transition-colors text-base flex items-center justify-center gap-2 font-bold w-full md:w-auto shadow-md shrink-0">
+                <!-- 右側：編集・書き出しコントロール (緑線領域) -->
+                <div class="w-[280px] md:w-[320px] shrink-0 bg-white/40 p-4 rounded-xl border border-white/60 shadow-sm flex flex-col justify-between gap-3 overflow-y-auto">
+                    
+                    <!-- ゲイン調整 -->
+                    <div class="flex flex-col gap-2">
+                        <div class="flex justify-between items-end">
+                            <span class="text-sm font-bold text-[#00b4d8]">Gain:</span>
+                            <span id="gain-val-display" class="text-sm font-mono font-bold text-[#0077b6]">0dB</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="gain-slider" min="-20" max="20" step="1" value="0" class="flex-1 h-5 bg-white/80 rounded-lg appearance-none cursor-pointer shadow-inner border border-white/50 accent-[#0077b6]">
+                            <button id="apply-gain-btn" class="text-sm py-1.5 px-3 rounded-lg border border-[#00b4d8] font-bold text-[#00b4d8] bg-white hover:bg-[#00b4d8] hover:text-white transition-colors shadow-sm whitespace-nowrap">適用</button>
+                        </div>
+                    </div>
+
+                    <div class="h-[1px] bg-[#00b4d8]/20 w-full"></div>
+
+                    <!-- ノーマライズ -->
+                    <button id="normalize-btn" class="btn-gold py-2.5 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 font-bold w-full shadow-md shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-8m-4 8l-4-8"></path></svg>
                         最大化 (Normalize)
                     </button>
-                </div>
-            </div>
 
-            <!-- エクスポートボタン (横並びで小さく) -->
-            <div class="flex gap-2 mt-auto shrink-0 h-10">
-                <button id="export-wav-btn" class="flex-1 bg-white/80 hover:bg-white border border-[#00b4d8]/50 text-[#0077b6] font-bold py-1 px-2 text-sm rounded transition-colors flex items-center justify-center gap-1 shadow-sm">
-                    <svg class="w-4 h-4 text-[#00b4d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    蔵へ納める (WAV)
-                </button>
-                <button id="export-mp3-btn" class="flex-1 bg-white/80 hover:bg-white border border-[#00b4d8]/50 text-[#0077b6] font-bold py-1 px-2 text-sm rounded transition-colors flex items-center justify-center gap-1 shadow-sm">
-                    <svg class="w-4 h-4 text-[#00b4d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    文で送る (MP3)
-                </button>
+                    <div class="h-[1px] bg-[#00b4d8]/20 w-full"></div>
+
+                    <!-- エクスポート -->
+                    <div class="flex flex-col gap-2 shrink-0">
+                        <button id="export-wav-btn" class="w-full bg-white/80 hover:bg-white border border-[#00b4d8]/50 text-[#0077b6] font-bold py-2.5 px-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm">
+                            <svg class="w-4 h-4 text-[#00b4d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            蔵へ納める (WAV)
+                        </button>
+                        <button id="export-mp3-btn" class="w-full bg-white/80 hover:bg-white border border-[#00b4d8]/50 text-[#0077b6] font-bold py-2.5 px-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm">
+                            <svg class="w-4 h-4 text-[#00b4d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            文で送る (MP3)
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
         
