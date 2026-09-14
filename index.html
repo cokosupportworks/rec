@@ -2,12 +2,11 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>音ノ姫 -Oto no Hime-</title>
 
-<link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <link rel="icon" href="apple-touch-icon.png">
-
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <link rel="icon" href="apple-touch-icon.png">
 
     <!-- Google Fonts: 雅な和風フォントと読みやすいゴシック -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,16 +28,14 @@
             --gold-light: #f9df9f;
             --gold-main: #d4af37;
             --gold-dark: #aa8222;
-            --edo-red: #e63946;
         }
 
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            /* 透き通る海から白い砂浜へのグラデーション */
             background: linear-gradient(135deg, var(--sea-clear-mid) 0%, var(--sea-clear-light) 40%, var(--sand-white) 100%);
             color: var(--sea-deep);
-            overscroll-behavior-y: none;
-            touch-action: none;
+            overscroll-behavior: none;
+            touch-action: none; /* ページ全体のデフォルトのパンやズームを無効化（ドラッグ時のスクロール防止） */
             min-height: 100vh;
         }
         
@@ -98,12 +95,11 @@
         .waveform-container {
             position: relative;
             width: 100%;
-            height: 200px;
-            background-color: rgba(253, 251, 247, 0.7);
+            background-color: rgba(255, 255, 255, 0.4);
             border: 1px solid rgba(0, 180, 216, 0.4);
             border-radius: 8px;
-            overflow: hidden;
-            touch-action: none;
+            overflow-x: auto;
+            touch-action: pan-x; /* 波形の横スクロールのみ許可 */
             box-shadow: inset 0 0 15px rgba(0, 119, 182, 0.05);
         }
         
@@ -180,9 +176,10 @@
 
     <header class="w-full max-w-5xl mb-2 flex justify-between items-center border-b border-[#00b4d8]/30 pb-2 relative z-10 shrink-0">
         <div class="flex items-center gap-2">
-            <!-- アイコンをhime02.pngに置き換え -->
-            <img src="./hime02.png" alt="姫" class="h-7 w-7 object-contain drop-shadow-sm" onerror="this.src='https://placehold.co/512x512/transparent/0077b6?text=hime02';">
-            <h1 class="text-2xl font-bold font-hime text-[#0077b6] tracking-wider drop-shadow-md">音ノ姫</h1>
+            <!-- アイコンを hime02.png に変更し、文字サイズに合わせた大きさに -->
+            <img src="./hime02.png" alt="姫" class="h-6 w-6 object-contain drop-shadow-sm" onerror="this.src='https://placehold.co/512x512/transparent/0077b6?text=hime02';">
+            <!-- 文字色をグラデーションではなく単色の濃い青にし、見やすく変更 -->
+            <h1 class="text-xl md:text-2xl font-bold font-hime text-[#0077b6] tracking-wider drop-shadow-md">音ノ姫</h1>
         </div>
         <div id="status-badge" class="px-3 py-1 rounded-full text-[10px] font-bold border border-[#00b4d8] bg-white/50 text-[#0077b6] shadow-sm">支度中 (Ready)</div>
     </header>
@@ -192,15 +189,15 @@
         <!-- 上部：入力設定と録音コントロールを横並びに -->
         <div class="flex flex-col md:flex-row gap-2 shrink-0">
             <!-- 音の入り口セクション -->
-            <section class="edo-panel p-3 flex-1 flex flex-col justify-center">
+            <section class="edo-panel p-2 md:p-3 flex-1 flex flex-col justify-center">
                 <div class="flex flex-wrap md:flex-nowrap justify-between items-center gap-2 mb-2">
-                    <h2 class="text-base font-hime text-[#0077b6] flex items-center gap-1 font-bold whitespace-nowrap">
+                    <h2 class="text-sm md:text-base font-hime text-[#0077b6] flex items-center gap-1 font-bold whitespace-nowrap">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
                         音の入り口
                     </h2>
                     
                     <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
-                        <label class="flex items-center gap-1 text-[11px] text-[#0077b6] font-medium cursor-pointer bg-white/60 px-2 py-1 rounded border border-white/80 shadow-sm whitespace-nowrap">
+                        <label class="flex items-center gap-1 text-[11px] text-[#0077b6] font-medium cursor-pointer bg-white/60 px-2 py-1 rounded border border-white/80 shadow-sm whitespace-nowrap" title="iPad内蔵マイクはON、MOTU等のインターフェースはOFFを推奨">
                             <input type="checkbox" id="audio-processing-cb" checked class="w-3 h-3 rounded text-[#00b4d8] focus:ring-[#00b4d8]">
                             <span>補正 (iPad用)</span>
                         </label>
@@ -232,53 +229,65 @@
             </section>
 
             <!-- 録音コントロールセクション -->
-            <section class="edo-panel p-3 flex flex-row items-center justify-between md:w-[320px] shrink-0 gap-4">
-                <div class="flex flex-col items-start w-[140px]">
-                    <div class="text-3xl font-mono text-[#0077b6] font-bold tracking-wider drop-shadow-md z-10 leading-none" id="time-display">00:00.000</div>
-                    <p id="rec-info" class="text-[11px] text-[#0077b6] mt-1 h-4 font-hime font-bold z-10 truncate w-full"></p>
+            <section class="edo-panel p-2 md:p-3 flex flex-row items-center justify-between md:w-[280px] shrink-0 gap-4">
+                <div class="flex flex-col items-start w-[120px]">
+                    <div class="text-2xl md:text-3xl font-mono text-[#0077b6] font-bold tracking-wider drop-shadow-md z-10 leading-none" id="time-display">00:00.000</div>
+                    <p id="rec-info" class="text-[10px] md:text-[11px] text-[#0077b6] mt-1 h-4 font-hime font-bold z-10 truncate w-full"></p>
                 </div>
                 
-                <div class="flex gap-3 z-10 shrink-0">
-                    <!-- 録音トグルボタン (Edo Red) -->
-                    <button id="record-btn" disabled class="w-12 h-12 rounded-full bg-white/80 border-[2px] border-[#e63946]/50 flex items-center justify-center transition-all focus:outline-none hover:border-[#e63946] hover:bg-white shadow-md group">
-                        <div id="record-icon" class="w-4 h-4 rounded-full bg-[#e63946] transition-all group-hover:scale-105 shadow-[0_2px_4px_rgba(230,57,70,0.5)]"></div>
+                <div class="flex gap-2 z-10 shrink-0">
+                    <!-- 録音トグルボタン -->
+                    <button id="record-btn" disabled class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 border-[2px] border-[#e63946]/50 flex items-center justify-center transition-all focus:outline-none hover:border-[#e63946] hover:bg-white shadow-md group">
+                        <div id="record-icon" class="w-3 h-3 md:w-4 md:h-4 rounded-full bg-[#e63946] transition-all group-hover:scale-105 shadow-[0_2px_4px_rgba(230,57,70,0.5)]"></div>
                     </button>
                     
-                    <!-- 再生トグルボタン (Clear Sea Blue) -->
-                    <button id="play-btn" disabled class="w-12 h-12 rounded-full bg-white/80 border-[2px] border-[#00b4d8]/50 flex items-center justify-center transition-all focus:outline-none hover:border-[#00b4d8] hover:bg-white shadow-md group hidden">
+                    <!-- 再生トグルボタン -->
+                    <button id="play-btn" disabled class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 border-[2px] border-[#00b4d8]/50 flex items-center justify-center transition-all focus:outline-none hover:border-[#00b4d8] hover:bg-white shadow-md group hidden">
                          <div id="play-icon">
-                             <svg class="w-6 h-6 text-[#00b4d8] ml-0.5 drop-shadow-sm group-hover:scale-105 transition-transform" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                             <svg class="w-5 h-5 md:w-6 md:h-6 text-[#00b4d8] ml-0.5 drop-shadow-sm group-hover:scale-105 transition-transform" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
                          </div>
-                         <div id="stop-play-icon" class="hidden w-4 h-4 bg-[#00b4d8] rounded-sm shadow-[0_2px_4px_rgba(0,180,216,0.5)]"></div>
+                         <div id="stop-play-icon" class="hidden w-3 h-3 md:w-4 md:h-4 bg-[#00b4d8] rounded-sm shadow-[0_2px_4px_rgba(0,180,216,0.5)]"></div>
                     </button>
                 </div>
             </section>
         </div>
 
-        <section id="editor-section" class="edo-panel p-3 flex flex-col flex-1 min-h-0">
+        <!-- エディタは最初からクリアに見えるように opacity や pointer-events-none を削除 -->
+        <section id="editor-section" class="edo-panel p-2 md:p-3 flex flex-col flex-1 min-h-0">
             <!-- ツールバー -->
-            <div class="flex flex-wrap md:flex-nowrap justify-between items-center mb-2 gap-2 shrink-0">
-                <h2 class="font-hime text-[#0077b6] flex items-center gap-1 text-lg font-bold whitespace-nowrap">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"></path></svg>
+            <div class="flex justify-between items-center mb-1 shrink-0">
+                <h2 class="font-hime text-[#0077b6] flex items-center gap-1 text-sm md:text-base font-bold whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"></path></svg>
                     切り結び (Edit)
                 </h2>
                 
-                <div class="flex flex-wrap items-center gap-2 justify-end w-full md:w-auto">
+                <div class="flex gap-2 items-center">
+                    <!-- Undo/Redo Buttons -->
+                    <div class="flex items-center bg-white/60 rounded p-1 border border-white/80 shadow-sm h-7">
+                        <button id="undo-btn" disabled class="p-1 hover:bg-white/80 rounded text-[#0077b6] transition-colors disabled:opacity-30 disabled:cursor-not-allowed" title="戻す (Undo)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                        </button>
+                        <div class="w-[1px] h-4 bg-[#00b4d8]/30 mx-1"></div>
+                        <button id="redo-btn" disabled class="p-1 hover:bg-white/80 rounded text-[#0077b6] transition-colors disabled:opacity-30 disabled:cursor-not-allowed" title="直す (Redo)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path></svg>
+                        </button>
+                    </div>
+
                     <!-- Zoom Controls -->
                     <div class="flex items-center bg-white/60 rounded p-1 border border-white/80 shadow-sm h-7">
-                        <button id="zoom-out-btn" class="p-0.5 hover:bg-white/80 rounded text-[#0077b6] transition-colors">
+                        <button id="zoom-out-btn" class="p-1 hover:bg-white/80 rounded text-[#0077b6] transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
                         </button>
-                        <span id="zoom-level-display" class="text-[11px] font-mono font-bold px-1.5 text-[#0077b6] w-9 text-center">1.0x</span>
-                        <button id="zoom-in-btn" class="p-0.5 hover:bg-white/80 rounded text-[#0077b6] transition-colors">
+                        <span id="zoom-level-display" class="text-xs font-mono font-bold px-1 md:px-2 text-[#0077b6] w-10 md:w-12 text-center">1.0x</span>
+                        <button id="zoom-in-btn" class="p-1 hover:bg-white/80 rounded text-[#0077b6] transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Waveform Editor (高さを抑える) -->
-            <div class="waveform-container mb-1 overflow-x-auto flex-1 !h-auto min-h-[100px] max-h-[160px]" id="waveform-container">
+            <!-- Waveform Editor -->
+            <div class="waveform-container mb-1 flex-1 !h-auto min-h-[100px] max-h-[160px]" id="waveform-container">
                 <div id="waveform-scroll-area" class="h-full relative min-w-full">
                     <canvas id="waveform-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
                     <div id="overlay-left" class="trim-overlay absolute top-0 bottom-0 left-0"></div>
@@ -286,7 +295,8 @@
                     
                     <!-- 再生位置を示すプレイヘッド -->
                     <div id="playhead" class="absolute top-0 bottom-0 w-[2px] bg-[#e63946] z-10 pointer-events-none hidden shadow-[0_0_5px_#e63946] -ml-[1px]">
-                        <div class="absolute -top-3 -left-[7px] w-4 h-4 rounded-full bg-[#e63946] border-2 border-white shadow-md pointer-events-auto"></div>
+                        <!-- 掴みやすいツマミ -->
+                        <div class="absolute -top-3 -left-[7px] w-4 h-4 rounded-full bg-[#e63946] border-2 border-white shadow-md"></div>
                     </div>
 
                     <div id="trim-start" class="trim-handle absolute !w-[16px]" data-type="start"></div>
@@ -294,58 +304,60 @@
                 </div>
             </div>
             
-            <div class="flex justify-between text-[11px] text-[#0077b6] font-mono font-bold mb-2 px-1 shrink-0">
+            <div class="flex justify-between text-[10px] md:text-[11px] text-[#0077b6] font-mono font-bold mb-2 px-1 shrink-0">
                 <span id="trim-time-start">00:00.000</span>
                 <span id="trim-duration" class="text-[#00b4d8]">Duration: 00:00.000</span>
                 <span id="trim-time-end">00:00.000</span>
             </div>
 
-            <!-- ▼ 波形下のコントロール＆画像エリア ▼ -->
-            <div class="flex flex-row gap-2 md:gap-4 flex-1 min-h-0 shrink-0 mb-2">
+            <!-- ▼▼ 波形下のコントロールエリア (50:50分割) ▼▼ -->
+            <div class="flex flex-row gap-2 md:gap-4 flex-1 min-h-0 shrink-0 mt-1">
                 
-                <!-- 左側：姫画像エリア (赤線領域) -->
-                <div class="w-1/2 relative bg-white/20 rounded-xl border border-white/40 shadow-inner flex items-center justify-center p-2 overflow-hidden shrink-0">
+                <!-- 左側：姫画像エリア (w-1/2 shrink-0 で固定50%) -->
+                <div class="w-1/2 shrink-0 relative bg-white/20 rounded-xl border border-white/40 shadow-inner flex items-center justify-center p-2 overflow-hidden">
                     <img src="./hime01.PNG" alt="音ノ姫" class="w-full h-full object-contain drop-shadow-md" onerror="this.src='https://placehold.co/1437x1095/transparent/0077b6?text=hime01.PNG';">
                 </div>
 
-                <!-- 右側：編集・書き出しコントロール (緑線領域) -->
-                <div class="w-1/2 shrink-0 bg-white/40 p-2 md:p-4 rounded-xl border border-white/60 shadow-sm flex flex-col justify-between gap-2 overflow-y-auto">
+                <!-- 右側：編集・書き出しコントロール (w-1/2 shrink-0 で固定50%) -->
+                <div class="w-1/2 shrink-0 bg-white/40 p-2 md:p-4 rounded-xl border border-white/60 shadow-sm flex flex-col justify-between gap-1 md:gap-2 overflow-y-auto">
                     
-                    <!-- ゲイン調整 -->
+                    <!-- Gain Controls -->
                     <div class="flex flex-col gap-1 md:gap-2">
                         <div class="flex justify-between items-end">
-                            <span class="text-sm font-bold text-[#00b4d8]">Gain:</span>
-                            <span id="gain-val-display" class="text-sm font-mono font-bold text-[#0077b6]">0dB</span>
+                            <span class="text-xs md:text-sm font-bold text-[#00b4d8]">Gain:</span>
+                            <span id="gain-val-display" class="text-xs md:text-sm font-mono font-bold text-[#0077b6]">0dB</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <input type="range" id="gain-slider" min="-20" max="20" step="1" value="0" class="flex-1 h-5 bg-white/80 rounded-lg appearance-none cursor-pointer shadow-inner border border-white/50 accent-[#0077b6]">
-                            <button id="apply-gain-btn" class="text-sm py-1.5 px-3 rounded-lg border border-[#00b4d8] font-bold text-[#00b4d8] bg-white hover:bg-[#00b4d8] hover:text-white transition-colors shadow-sm whitespace-nowrap">適用</button>
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <input type="range" id="gain-slider" min="-20" max="20" step="1" value="0" class="flex-1 h-4 md:h-5 bg-white/80 rounded-lg appearance-none cursor-pointer shadow-inner border border-white/50 accent-[#0077b6]">
+                            <button id="apply-gain-btn" class="text-xs md:text-sm py-1.5 md:py-2 px-2 md:px-3 rounded-lg border border-[#00b4d8] font-bold text-[#00b4d8] bg-white hover:bg-[#00b4d8] hover:text-white transition-colors shadow-sm whitespace-nowrap">適用</button>
                         </div>
                     </div>
 
-                    <div class="h-[1px] bg-[#00b4d8]/20 w-full"></div>
+                    <div class="h-[1px] bg-[#00b4d8]/20 w-full my-1"></div>
 
-                    <!-- ノーマライズ -->
-                    <button id="normalize-btn" class="btn-gold py-2.5 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 font-bold w-full shadow-md shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-8m-4 8l-4-8"></path></svg>
+                    <!-- Normalize -->
+                    <button id="normalize-btn" class="btn-gold py-2 md:py-2.5 px-2 md:px-4 rounded-lg transition-colors text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 font-bold w-full shadow-md shrink-0">
+                        <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-8m-4 8l-4-8"></path></svg>
                         最大化 (Normalize)
                     </button>
 
-                    <div class="h-[1px] bg-[#00b4d8]/20 w-full"></div>
+                    <div class="h-[1px] bg-[#00b4d8]/20 w-full my-1"></div>
 
-                    <!-- エクスポート -->
-                    <div class="flex flex-col gap-2 shrink-0">
-                        <button id="export-wav-btn" class="w-full bg-white/80 hover:bg-white border border-[#00b4d8]/50 text-[#0077b6] font-bold py-2.5 px-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm">
-                            <svg class="w-4 h-4 text-[#00b4d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <!-- Export -->
+                    <div class="flex flex-col gap-1 md:gap-2 shrink-0">
+                        <button id="export-wav-btn" class="w-full bg-white/80 hover:bg-white border border-[#00b4d8]/50 text-[#0077b6] font-bold py-1.5 md:py-2 px-1 md:px-2 text-[10px] md:text-xs rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm">
+                            <svg class="w-3 h-3 md:w-4 md:h-4 text-[#00b4d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             蔵へ納める (WAV)
                         </button>
-                        <button id="export-mp3-btn" class="w-full bg-white/80 hover:bg-white border border-[#00b4d8]/50 text-[#0077b6] font-bold py-2.5 px-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm">
-                            <svg class="w-4 h-4 text-[#00b4d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <button id="export-mp3-btn" class="w-full bg-white/80 hover:bg-white border border-[#00b4d8]/50 text-[#0077b6] font-bold py-1.5 md:py-2 px-1 md:px-2 text-[10px] md:text-xs rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm">
+                            <svg class="w-3 h-3 md:w-4 md:h-4 text-[#00b4d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             文で送る (MP3)
                         </button>
                     </div>
                 </div>
             </div>
+            <!-- ▲▲ ここまで ▲▲ -->
+
         </section>
         
         <div id="message-modal" class="fixed inset-0 bg-white/20 backdrop-blur-md flex items-center justify-center z-50 hidden opacity-0 transition-opacity">
@@ -368,7 +380,7 @@
         let mediaStreamSource;
         let analyser;
         let mediaStream;
-        let scriptProcessor; // Recording processor
+        let scriptProcessor; // Recording processor (並列ルーティング用)
         
         // Recording state
         let isRecording = false;
@@ -385,9 +397,13 @@
         let currentAudioBuffer = null;
         let trimStartRatio = 0; 
         let trimEndRatio = 1.0; 
-        let playheadTime = 0; // 追加: 現在の再生位置(秒)
+        let playheadTime = 0; 
         let playbackSourceNode = null;
         let zoomLevel = 1.0;
+
+        // Undo/Redo State
+        let editHistory = [];
+        let historyIndex = -1;
 
         // UI Elements
         const initAudioBtn = document.getElementById('init-audio-btn');
@@ -417,13 +433,15 @@
         const waveContainer = document.getElementById('waveform-container');
         const waveScrollArea = document.getElementById('waveform-scroll-area');
         
-        // Editor Controls (Zoom & Gain)
+        // Editor Controls (Zoom, Gain, Undo/Redo)
         const zoomInBtn = document.getElementById('zoom-in-btn');
         const zoomOutBtn = document.getElementById('zoom-out-btn');
         const zoomLevelDisplay = document.getElementById('zoom-level-display');
         const gainSlider = document.getElementById('gain-slider');
         const gainValDisplay = document.getElementById('gain-val-display');
         const applyGainBtn = document.getElementById('apply-gain-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
 
         // Trim UI
         const trimStartHandle = document.getElementById('trim-start');
@@ -433,7 +451,7 @@
         const trimTimeStartDisplay = document.getElementById('trim-time-start');
         const trimTimeEndDisplay = document.getElementById('trim-time-end');
         const trimDurationDisplay = document.getElementById('trim-duration');
-        const playheadEl = document.getElementById('playhead'); // 追加
+        const playheadEl = document.getElementById('playhead');
 
         // Modal
         const modal = document.getElementById('message-modal');
@@ -458,6 +476,74 @@
         modalCloseBtn.addEventListener('click', () => {
             modal.classList.add('opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 300);
+        });
+
+        // --- Undo / Redo Functions ---
+        function cloneAudioBuffer(src) {
+            if (!src || !audioContext) return null;
+            const cloned = audioContext.createBuffer(src.numberOfChannels, src.length, src.sampleRate);
+            for (let c = 0; c < src.numberOfChannels; c++) {
+                cloned.copyToChannel(src.getChannelData(c), c);
+            }
+            return cloned;
+        }
+
+        function pushHistorySnapshot() {
+            if (!currentAudioBuffer) return;
+            const snapshot = {
+                buffer: cloneAudioBuffer(currentAudioBuffer),
+                trimStartRatio: trimStartRatio,
+                trimEndRatio: trimEndRatio
+            };
+            
+            // 現在のインデックスより先の履歴は削除
+            editHistory = editHistory.slice(0, historyIndex + 1);
+            editHistory.push(snapshot);
+            
+            // 履歴の最大数を10に制限
+            if (editHistory.length > 10) {
+                editHistory.shift();
+            } else {
+                historyIndex++;
+            }
+            updateHistoryButtons();
+        }
+
+        function updateHistoryButtons() {
+            undoBtn.disabled = historyIndex <= 0;
+            redoBtn.disabled = historyIndex >= editHistory.length - 1;
+        }
+
+        function restoreFromSnapshot(snapshot) {
+            if (isPlaying) stopPlayback();
+            currentAudioBuffer = cloneAudioBuffer(snapshot.buffer);
+            trimStartRatio = snapshot.trimStartRatio;
+            trimEndRatio = snapshot.trimEndRatio;
+            
+            // 再生位置をトリム開始位置にリセット
+            playheadTime = trimStartRatio * currentAudioBuffer.duration;
+            
+            // スライダーをリセット
+            gainSlider.value = 0;
+            gainValDisplay.textContent = "0dB";
+            
+            updateTrimUI();
+            drawWaveform(currentAudioBuffer);
+            updateHistoryButtons();
+        }
+
+        undoBtn.addEventListener('click', () => {
+            if (historyIndex > 0) {
+                historyIndex--;
+                restoreFromSnapshot(editHistory[historyIndex]);
+            }
+        });
+
+        redoBtn.addEventListener('click', () => {
+            if (historyIndex < editHistory.length - 1) {
+                historyIndex++;
+                restoreFromSnapshot(editHistory[historyIndex]);
+            }
         });
 
         async function updateDeviceList() {
@@ -503,12 +589,12 @@
         });
 
         initAudioBtn.addEventListener('click', async () => {
-            // Safari対策: ユーザーアクション同期でContext生成、48kHz固定
+            // Safari対策: ユーザーアクション同期でContext生成、48kHz完全固定
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
             }
             if (audioContext.state === 'suspended') {
-                audioContext.resume();
+                await audioContext.resume();
             }
 
             if (mediaStream) {
@@ -532,10 +618,10 @@
 
                 mediaStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
                 
-                sampleRate = audioContext.sampleRate; // 確認(48000になるはず)
+                sampleRate = audioContext.sampleRate; // 48000
                 mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
                 
-                // --- 【重要】並列ルーティング (音質劣化防止・ChatGPT版ロジック) ---
+                // --- 【並列ルーティング】 (音質劣化防止) ---
                 
                 // 分岐1: メーター用 (録音には影響させない)
                 analyser = audioContext.createAnalyser();
@@ -567,7 +653,7 @@
             } catch (err) {
                 console.error("Initialization error:", err);
                 const detail = err.name ? `[${err.name}] ` : '';
-                showModal("お繋ぎ失敗", detail + (err.message || "マイクへのアクセスに失敗いたしました。iPadの「設定 > Safari > マイク」が「許可」になっているか確認してくだされ。"));
+                showModal("お繋ぎ失敗", detail + (err.message || "マイクへのアクセスに失敗いたしました。設定が許可されているか確認してくだされ。"));
             }
         });
 
@@ -620,9 +706,9 @@
             meterCtx.clearRect(0, 0, width, height);
 
             const gradient = meterCtx.createLinearGradient(0, 0, width, 0);
-            gradient.addColorStop(0, '#00b4d8'); // Clear Blue
-            gradient.addColorStop(0.7, '#d4af37'); // Gold
-            gradient.addColorStop(0.9, '#e63946'); // Edo Red
+            gradient.addColorStop(0, '#00b4d8');
+            gradient.addColorStop(0.7, '#d4af37');
+            gradient.addColorStop(0.9, '#e63946');
 
             meterCtx.fillStyle = gradient;
             meterCtx.fillRect(0, 0, barWidth, height);
@@ -647,8 +733,9 @@
                 playBtn.classList.add('hidden');
                 if (isPlaying) stopPlayback();
                 
-                // 録音中のエディタセクションの無効化（透明度は下げない）
+                // 録音中のエディタセクションの無効化
                 editorSection.classList.add('pointer-events-none');
+                editorSection.classList.add('opacity-50');
                 
                 recordIcon.classList.remove('rounded-full');
                 recordIcon.classList.add('rounded-sm');
@@ -713,20 +800,26 @@
             trimEndRatio = 1;
             zoomLevel = 1.0;
             zoomLevelDisplay.textContent = '1.0x';
-            playheadTime = 0; // 追加
+            playheadTime = 0;
+            
+            // 履歴のリセットと初期状態の保存
+            editHistory = [];
+            historyIndex = -1;
+            pushHistorySnapshot();
             
             updateTrimUI();
             drawWaveform(currentAudioBuffer);
             
             editorSection.classList.remove('pointer-events-none');
+            editorSection.classList.remove('opacity-50');
             recInfo.textContent = `記録完了 ${formatTime(currentAudioBuffer.duration)}`;
         }
 
         function drawWaveform(buffer) {
             if (!buffer) return;
-            const containerWidth = waveContainer.clientWidth;
+            const containerWidth = waveContainer.clientWidth || 300;
             const width = Math.max(containerWidth, containerWidth * zoomLevel);
-            const height = waveContainer.clientHeight;
+            const height = waveContainer.clientHeight || 100;
             
             waveScrollArea.style.width = width + 'px';
             
@@ -742,17 +835,18 @@
             const step = Math.ceil(data.length / width);
             const amp = height / 2;
 
-            waveCtx.fillStyle = '#fdfbf7'; // Sand white background for wave
+            waveCtx.fillStyle = '#fdfbf7'; // Sand white
             waveCtx.fillRect(0, 0, width, height);
             
             waveCtx.beginPath();
             
-            // Center Line (Gold)
+            // Center Line
             waveCtx.moveTo(0, amp);
             waveCtx.lineTo(width, amp);
             waveCtx.strokeStyle = 'rgba(212, 175, 55, 0.4)'; 
             waveCtx.stroke();
 
+            // 元の波形描画
             waveCtx.beginPath();
             for (let i = 0; i < width; i++) {
                 let min = 1.0;
@@ -765,11 +859,11 @@
                 waveCtx.moveTo(i, (1 + min) * amp);
                 waveCtx.lineTo(i, (1 + max) * amp);
             }
-            waveCtx.strokeStyle = '#00b4d8'; // Clear blue waveform
+            waveCtx.strokeStyle = '#00b4d8'; // Clear blue
             waveCtx.lineWidth = 1;
             waveCtx.stroke();
 
-            // ▼▼▼ プレビュー波形の描画（ここから追加） ▼▼▼
+            // Gainプレビューのリアルタイムオーバーレイ表示
             const previewDb = parseInt(gainSlider.value) || 0;
             if (previewDb !== 0) {
                 const multiplier = Math.pow(10, previewDb / 20);
@@ -779,29 +873,30 @@
                     let max = -1.0;
                     for (let j = 0; j < step; j++) {
                         const datum = data[(i * step) + j] * multiplier;
-                        const clamped = Math.max(-1.0, Math.min(1.0, datum)); // 限界値（クリッピング）を計算
+                        const clamped = Math.max(-1.0, Math.min(1.0, datum));
                         if (clamped < min) min = clamped;
                         if (clamped > max) max = clamped;
                     }
                     waveCtx.moveTo(i, (1 + min) * amp);
                     waveCtx.lineTo(i, (1 + max) * amp);
                 }
-                waveCtx.strokeStyle = 'rgba(212, 175, 55, 0.8)'; // 江戸の金色でオーバーレイ表示
+                waveCtx.strokeStyle = 'rgba(212, 175, 55, 0.8)'; // 江戸の金
                 waveCtx.lineWidth = 1.5;
                 waveCtx.stroke();
                 
-                // キャンバス上にプレビュー中であることをテキスト表示
+                // テキスト表示
                 waveCtx.fillStyle = '#d4af37';
                 waveCtx.font = "bold 12px 'Noto Sans JP', sans-serif";
                 waveCtx.fillText(`Gain Preview: ${previewDb > 0 ? '+' : ''}${previewDb}dB`, 10, height - 10);
             }
-            // ▲▲▲ 追加ここまで ▲▲▲
         }
 
         let isDragging = false;
         let activeHandle = null;
         let isDraggingPlayhead = false;
         let wasPlayingBeforeDrag = false;
+        let initialTrimStartRatio = 0;
+        let initialTrimEndRatio = 1;
 
         function updateTrimUI() {
             if (!currentAudioBuffer) return;
@@ -821,7 +916,6 @@
             const tStart = trimStartRatio * dur;
             const tEnd = trimEndRatio * dur;
             
-            // プレイヘッドが範囲外になったらクランプする
             if (playheadTime < tStart) playheadTime = tStart;
             if (playheadTime > tEnd) playheadTime = tEnd;
             updatePlayheadUI();
@@ -831,11 +925,10 @@
             trimDurationDisplay.textContent = `尺(Duration): ${formatTime(tEnd - tStart)}`;
             
             if (!isPlaying) {
-                timeDisplay.textContent = formatTime(playheadTime); // 再生位置を表示するように変更
+                timeDisplay.textContent = formatTime(playheadTime);
             }
         }
 
-        // 追加: プレイヘッドの描画更新
         function updatePlayheadUI() {
             if (!currentAudioBuffer) return;
             const dur = currentAudioBuffer.duration;
@@ -852,15 +945,15 @@
             }
         });
 
-        // 確実なポインタートラッキングとプレイヘッドドラッグ
         function handlePointerDown(e) {
             if (e.target === trimStartHandle || e.target === trimEndHandle) {
                 isDragging = true;
                 activeHandle = e.target.dataset.type; 
+                initialTrimStartRatio = trimStartRatio;
+                initialTrimEndRatio = trimEndRatio;
                 if(e.pointerId) e.target.setPointerCapture(e.pointerId);
                 e.preventDefault(); 
             } else if (e.target.closest('#waveform-scroll-area') && !e.target.closest('.trim-handle')) {
-                // 波形エリアのドラッグでプレイヘッド移動
                 isDraggingPlayhead = true;
                 wasPlayingBeforeDrag = isPlaying;
                 if (isPlaying) stopPlayback();
@@ -871,11 +964,7 @@
         }
 
         function handlePointerMove(e) {
-            // 画面全体のスクロール防止
-            if (isDragging || isDraggingPlayhead) {
-                e.preventDefault();
-            }
-
+            if (isDragging || isDraggingPlayhead) e.preventDefault();
             if (!isDragging && !isDraggingPlayhead) return;
             
             if (isDragging && activeHandle) {
@@ -884,7 +973,6 @@
                 
                 let x = clientX - rect.left;
                 x = Math.max(0, Math.min(x, rect.width));
-                
                 let ratio = x / rect.width;
 
                 if (activeHandle === 'start') {
@@ -894,7 +982,6 @@
                     if (ratio <= trimStartRatio + 0.005) ratio = trimStartRatio + 0.005;
                     trimEndRatio = ratio;
                 }
-
                 updateTrimUI();
             } else if (isDraggingPlayhead) {
                 updatePlayheadFromEvent(e);
@@ -909,9 +996,15 @@
                 waveScrollArea.releasePointerCapture(e.pointerId);
             }
             
-            // ドラッグ終了時に、元々再生中だったら再生を再開する
             if (isDraggingPlayhead && wasPlayingBeforeDrag) {
                 startPlayback();
+            }
+            
+            // Undo/Redo のための履歴追加 (トリム操作後)
+            if (isDragging && activeHandle) {
+                if (trimStartRatio !== initialTrimStartRatio || trimEndRatio !== initialTrimEndRatio) {
+                    pushHistorySnapshot();
+                }
             }
             
             isDragging = false;
@@ -975,11 +1068,9 @@
             }
         });
 
-        // Gain Slider
         gainSlider.addEventListener('input', (e) => {
             const val = parseInt(e.target.value);
             gainValDisplay.textContent = (val > 0 ? '+' : '') + val + 'dB';
-            // スライダー操作時にリアルタイムで波形を再描画（プレビュー反映）
             if (currentAudioBuffer) {
                 drawWaveform(currentAudioBuffer);
             }
@@ -1010,9 +1101,12 @@
                     chR[i] = Math.max(-1.0, Math.min(1.0, nR));
                 }
 
-                // スライダーを0に戻してから波形を描画し直す（プレビューを消すため）
                 gainSlider.value = 0;
                 gainValDisplay.textContent = "0dB";
+                
+                // 変更を履歴に追加
+                pushHistorySnapshot();
+                
                 drawWaveform(currentAudioBuffer);
                 
                 const msg = clipped 
@@ -1031,7 +1125,6 @@
             const tStart = trimStartRatio * dur;
             const tEnd = trimEndRatio * dur;
             
-            // プレイヘッドが終端付近にある場合は最初から再生する
             if (playheadTime >= tEnd - 0.01) {
                 playheadTime = tStart;
                 updatePlayheadUI();
@@ -1060,7 +1153,7 @@
                 
                 if (playheadTime >= tEnd) {
                     stopPlayback();
-                    playheadTime = tStart; // 停止時は最初に戻す
+                    playheadTime = tStart; 
                     updatePlayheadUI();
                     timeDisplay.textContent = formatTime(playheadTime);
                     return;
@@ -1129,10 +1222,13 @@
                         chR[i] *= multiplier;
                     }
                     
-                    gainSlider.value = 0; // ノーマライズ時にもスライダーをリセット
+                    gainSlider.value = 0; 
                     gainValDisplay.textContent = "0dB";
-                    drawWaveform(currentAudioBuffer);
                     
+                    // 変更を履歴に追加
+                    pushHistorySnapshot();
+                    
+                    drawWaveform(currentAudioBuffer);
                     showModal("最大化 完了", `全体の音量を ${(20 * Math.log10(multiplier)).toFixed(2)} dB 引き上げました。`);
                 } else {
                      showModal("お知らせ", "既に最大音量に達しているか、無音でござりまする。");
@@ -1156,7 +1252,6 @@
             return { l: trimmedL, r: trimmedR, length: durationSamples };
         }
 
-        // 高精度変換アルゴリズム (ChatGPT版を採用)
         function floatToInt16(float32Array) {
             const int16Array = new Int16Array(float32Array.length);
             for (let i = 0; i < float32Array.length; i++) {
@@ -1194,7 +1289,6 @@
             }, 100);
         }
 
-        // Export WAV
         exportWavBtn.addEventListener('click', async () => {
             if (!currentAudioBuffer) return;
             
@@ -1255,7 +1349,6 @@
             return view;
         }
 
-        // Export MP3
         exportMp3Btn.addEventListener('click', async () => {
             if (!currentAudioBuffer) return;
             if (typeof lamejs === 'undefined') {
